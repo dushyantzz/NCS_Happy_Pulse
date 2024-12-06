@@ -2,17 +2,18 @@ import { useState } from 'react';
 import { Search, AlertCircle, ThermometerSnowflake } from 'lucide-react';
 
 const commonSymptoms = [
-  { name: 'Fever', severity: 'moderate', urgency: 'medium' },
-  { name: 'Headache', severity: 'mild', urgency: 'low' },
-  { name: 'Cough', severity: 'mild', urgency: 'low' },
-  { name: 'Shortness of Breath', severity: 'severe', urgency: 'high' },
-  { name: 'Fatigue', severity: 'mild', urgency: 'low' },
-  { name: 'Body Aches', severity: 'moderate', urgency: 'medium' }
+  { name: 'Fever', severity: 'moderate', urgency: 'medium', description: 'A high body temperature, often caused by infection.' },
+  { name: 'Headache', severity: 'mild', urgency: 'low', description: 'Pain or discomfort in the head, often due to stress or tension.' },
+  { name: 'Cough', severity: 'mild', urgency: 'low', description: 'A reflex action to clear the throat and airways.' },
+  { name: 'Shortness of Breath', severity: 'severe', urgency: 'high', description: 'A feeling of not being able to breathe deeply.' },
+  { name: 'Fatigue', severity: 'mild', urgency: 'low', description: 'A general sense of tiredness or lack of energy.' },
+  { name: 'Body Aches', severity: 'moderate', urgency: 'medium', description: 'Pain in muscles or joints, often a sign of an underlying infection.' },
 ];
 
 const Symptoms = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSymptom, setSelectedSymptom] = useState(null);
+  const [symptomHistory, setSymptomHistory] = useState([]);
 
   const filteredSymptoms = commonSymptoms.filter(symptom =>
     symptom.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -31,6 +32,11 @@ const Symptoms = () => {
     }
   };
 
+  const handleSymptomClick = (symptom) => {
+    setSelectedSymptom(symptom);
+    setSymptomHistory((prevHistory) => [...prevHistory, symptom.name]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,8 +53,16 @@ const Symptoms = () => {
               placeholder="Search symptoms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#09B480]"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-3 text-gray-400"
+              >
+                X
+              </button>
+            )}
           </div>
         </div>
 
@@ -59,12 +73,12 @@ const Symptoms = () => {
               {filteredSymptoms.map((symptom, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg border cursor-pointer transition-colors duration-200 ${
-                    selectedSymptom === symptom.name
-                      ? 'border-[#09B480] bg-[#09B480] bg-opacity-30'
-                      : 'border-gray-200 hover:border-[#09B480]'
+                  className={`p-4 rounded-lg border cursor-pointer transition-colors duration-200 hover:border-blue-400 ${
+                    selectedSymptom === symptom
+                      ? 'border-blue-400 bg-blue-50'
+                      : 'border-gray-200'
                   }`}
-                  onClick={() => setSelectedSymptom(symptom.name)}
+                  onClick={() => handleSymptomClick(symptom)}
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{symptom.name}</span>
@@ -104,9 +118,35 @@ const Symptoms = () => {
             </div>
           </div>
         </div>
+
+        {/* Selected Symptom Details */}
+        {selectedSymptom && (
+          <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Symptom Details</h2>
+            <p className="text-lg font-medium">{selectedSymptom.name}</p>
+            <p className="text-gray-600">{selectedSymptom.description}</p>
+          </div>
+        )}
+
+        {/* Symptom History */}
+        {symptomHistory.length > 0 && (
+          <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Symptom History</h2>
+            <ul className="space-y-2">
+              {symptomHistory.map((symptom, index) => (
+                <li key={index} className="text-gray-700">
+                  {symptom}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default Symptoms;
+
+
+
